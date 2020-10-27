@@ -1,0 +1,15 @@
+require 'robobot-server'
+
+class Win7 < Robobot::Worker
+  def install_sensor!(hostname:, token:)
+    command = './sensord install --org-hostname=%s --org-token=%s' % [hostname, token]
+    system(command) or raise 'Error installing sensor!'
+  end
+end
+
+worker = Win7.new(
+  node_id: :win7,
+  redis: Redis.new(url: ENV.fetch('REDIS_URL')),
+)
+server = Robobot::Server.new(worker: worker)
+server.listen!
